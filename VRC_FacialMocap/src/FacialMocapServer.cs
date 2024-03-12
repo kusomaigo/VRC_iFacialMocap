@@ -29,7 +29,7 @@ namespace VRCFacialMocap
                 client.Send(bytes, bytes.Length, dstAddr);
                 client.Close();
 
-                _udpServer.Connect(ipaddress, _port);
+                _udpServer.Connect("localhost", _port);
 
             }
             catch (Exception e)
