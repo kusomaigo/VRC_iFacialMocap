@@ -8,7 +8,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="VRCFaceTracking.Core">
-        <HintPath>VRCFaceTracking.Core.dll</HintPath>
+        <HintPath>../VRCFaceTracking.Core.dll</HintPath>
     </Reference>
 </ItemGroup>
 

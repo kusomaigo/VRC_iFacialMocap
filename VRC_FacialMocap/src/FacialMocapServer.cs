@@ -16,7 +16,7 @@ namespace VRCFacialMocap
         /// Connects to the Facial Mockup server socket.
         /// </summary>
         /// <param name="ipaddress"></param>
-        public void Connect(string ipaddress)
+        public void Connect(string ipaddress = "255.255.255.255")
         {
             _udpServer = new(_port);
             UdpClient client = new();
@@ -30,6 +30,7 @@ namespace VRCFacialMocap
                 client.Close();
 
                 _udpServer.Connect("localhost", _port);
+                
 
             }
             catch (Exception e)
