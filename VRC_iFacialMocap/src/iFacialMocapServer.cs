@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using iFacialMocapTrackingModule;
 
 namespace iFacialMocapTrackingModule
 {
@@ -9,8 +8,13 @@ namespace iFacialMocapTrackingModule
     {
         private int _port = 49983; //port
         private FacialMocapData _trackedData = new();
-        private UdpClient? _udpServer;
+        private UdpClient? _udpListener, _udpClient;
         public FacialMocapData FaceData { get {return _trackedData;}}
+
+        public void Stop(){
+            if(_udpClient!=null) _udpClient.Close();
+            if(_udpListener!=null) _udpListener.Close();
+        }
 
         /// <summary>
         /// Connects to the Facial Mockup server socket.
@@ -18,26 +22,26 @@ namespace iFacialMocapTrackingModule
         /// <param name="ipaddress"></param>
         public void Connect(string ipaddress = "255.255.255.255")
         {
-            _udpServer = new(_port);
-            UdpClient client = new();
+            _udpListener = new(_port);
+            _udpClient = new();
             try
             {
                 
                 IPEndPoint dstAddr = new(IPAddress.Parse(ipaddress), _port);
                 string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
                 byte[] bytes = Encoding.UTF8.GetBytes(data);
-                client.Send(bytes, bytes.Length, dstAddr);
-                client.Close();
+                _udpClient.Send(bytes, bytes.Length, dstAddr);
+                _udpClient.Close();
 
-                _udpServer.Connect("localhost", _port);
-                
+                _udpListener.Connect("", _port);
+                _udpListener.Client.ReceiveTimeout = 1000;
 
             }
             catch (Exception e)
             {
                 Console.WriteLine($"An exception has been caught while connecting to {ipaddress}:{_port} : {e}");
-                _udpServer.Close();
-                client.Close();
+                _udpListener.Close();
+                _udpClient.Close();
             }
 
         }
@@ -48,10 +52,10 @@ namespace iFacialMocapTrackingModule
         /// </summary>
         void ReadData()
         {
-            if (_udpServer != null)
+            if (_udpListener != null)
             {
                 IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, 0);
-                byte[] receiveBytes = _udpServer.Receive(ref RemoteIpEndPoint);
+                byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
                 string returnData = Encoding.ASCII.GetString(receiveBytes);
                 string[] blendData = returnData.Split('|');
                 var props = typeof(FacialMocapData).GetFields();
