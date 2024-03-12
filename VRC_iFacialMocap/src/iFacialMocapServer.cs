@@ -5,7 +5,7 @@ using FacialMocapTrackingModule;
 
 namespace VRCFacialMocap
 {
-    class FacialMocapServer
+    class iFacialMocapServer
     {
         private int _port = 49983; //port
         private FacialMocapData _trackedData = new();
