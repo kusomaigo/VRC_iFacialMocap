@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using FacialMocapTrackingModule;
 
-namespace VRCFacialMocap
+namespace iFacialMocapTrackingModule
 {
     class iFacialMocapServer
     {

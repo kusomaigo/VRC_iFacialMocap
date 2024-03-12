@@ -1,6 +1,6 @@
-﻿using FacialMocapTrackingModule;
+﻿using iFacialMocapTrackingModule;
 
-namespace VRCFacialMocap
+namespace VRCiFacialMocap
 {
     class Program
     {

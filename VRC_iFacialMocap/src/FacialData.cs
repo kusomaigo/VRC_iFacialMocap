@@ -1,4 +1,4 @@
-namespace FacialMocapTrackingModule
+namespace iFacialMocapTrackingModule
 {
     public class FacialMocapData{
         public int mouthSmile_R;
