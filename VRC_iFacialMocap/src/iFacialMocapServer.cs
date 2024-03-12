@@ -58,13 +58,14 @@ namespace iFacialMocapTrackingModule
                 byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
                 string returnData = Encoding.ASCII.GetString(receiveBytes);
                 string[] blendData = returnData.Split('|');
+                blendData = blendData[1..^1];
                 var props = typeof(FacialMocapData).GetFields();
                 if (props.Length == blendData.Length)
                 {
                     int i = 0;
                     while (i < props.Length - 3 && !blendData[i].Contains('=')) //While in the int attributes
                     {
-                        string[] assignVal = blendData[i].Split(" & ");
+                        string[] assignVal = blendData[i].Split('&');
                         try
                         {
                             if (assignVal[0] == props[i].Name)
