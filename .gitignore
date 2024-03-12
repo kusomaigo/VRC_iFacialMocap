@@ -1,0 +1,7 @@
+VRC_FacialMocap/bin
+VRC_FacialMocap/obj
+VRC_FacialMocap/packages
+VRCFaceTracking.Core.dll
+*.suo
+*.user
+_ReSharper.*
