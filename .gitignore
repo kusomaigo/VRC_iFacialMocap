@@ -1,6 +1,6 @@
-VRC_FacialMocap/bin
-VRC_FacialMocap/obj
-VRC_FacialMocap/packages
+VRC_iFacialMocap/bin
+VRC_iFacialMocap/obj
+VRC_iFacialMocap/packages
 VRCFaceTracking.Core.dll
 *.suo
 *.user

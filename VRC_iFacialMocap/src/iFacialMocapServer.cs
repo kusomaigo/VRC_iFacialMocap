@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using FacialMocapTrackingModule;
+using iFacialMocapTrackingModule;
 
 namespace iFacialMocapTrackingModule
 {
