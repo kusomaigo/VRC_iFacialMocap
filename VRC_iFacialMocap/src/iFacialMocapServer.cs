@@ -9,11 +9,15 @@ namespace iFacialMocapTrackingModule
         private int _port = 49983; //port
         private FacialMocapData _trackedData = new();
         private UdpClient? _udpListener, _udpClient;
-        public FacialMocapData FaceData { get {return _trackedData;}}
-
-        public void Stop(){
-            if(_udpClient!=null) _udpClient.Close();
-            if(_udpListener!=null) _udpListener.Close();
+        public FacialMocapData FaceData { get { return _trackedData; } }
+        
+        /// <summary>
+        /// Stops and disposes the clients
+        /// </summary>
+        public void Stop()
+        {
+            if (_udpClient != null) { _udpClient.Close(); _udpClient.Dispose(); }
+            if (_udpListener != null) { _udpListener.Close(); _udpListener.Dispose(); }
         }
 
         /// <summary>
@@ -26,7 +30,7 @@ namespace iFacialMocapTrackingModule
             _udpClient = new();
             try
             {
-                
+
                 IPEndPoint dstAddr = new(IPAddress.Parse(ipaddress), _port);
                 string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
                 byte[] bytes = Encoding.UTF8.GetBytes(data);
@@ -60,55 +64,51 @@ namespace iFacialMocapTrackingModule
                 string[] blendData = returnData.Split('|');
                 blendData = blendData[1..^1];
                 var props = typeof(FacialMocapData).GetFields();
-                if (props.Length == blendData.Length)
+                int i = 0;
+                while (i < props.Length) //While in the int attributes
                 {
-                    int i = 0;
-                    while (i < props.Length) //While in the int attributes
+                    if (blendData[i].Contains('='))
                     {
-                        if(blendData[i].Contains('=')){
-                            /*string[] assignVal = blendData[i].Split('#');
-                            try
+                        /*string[] assignVal = blendData[i].Split('#');
+                        try
+                        {
+                        if (assignVal[0] == props[i].Name)
                             {
-                            if (assignVal[0] == props[i].Name)
+                                check if float data
+                                string[] unparsedValues = assignVal[1].Split(',');
+                                float[] values = new float[unparsedValues.Length];
+                                for (int j = 0; j < unparsedValues.Length; j++)
                                 {
-                                    check if float data
-                                    string[] unparsedValues = assignVal[1].Split(',');
-                                    float[] values = new float[unparsedValues.Length];
-                                    for (int j = 0; j < unparsedValues.Length; j++)
-                                    {
-                                        values[j] = float.Parse(unparsedValues[j]);
-                                    }
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Error on setting {assignVal}.");
-                                    return;
+                                    values[j] = float.Parse(unparsedValues[j]);
                                 }
                             }
-                            catch (Exception e)
+                            else
                             {
-                                Console.WriteLine($"Bad packet. [{e}]");
-                                return;
-                            }*/
-                        }else{
-                            string[] assignVal = blendData[i].Split('&');
-                            try
-                            {
-                                //assign on dict FaceData.blends
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine($"Bad packet. [{e}]");
+                                Console.WriteLine($"Error on setting {assignVal}.");
                                 return;
                             }
-                            i++;
                         }
-                        
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Bad packet. [{e}]");
+                            return;
+                        }*/
                     }
-                }
-                else
-                {
-                    Console.WriteLine($"The packet is incomplete. [{blendData.Length}/{props.Length}]");
+                    else
+                    {
+                        string[] assignVal = blendData[i].Split('&');
+                        try
+                        {
+                            //assign on dict FaceData.blends
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Bad packet. [{e}]");
+                            return;
+                        }
+                        i++;
+                    }
+
                 }
 
             }
