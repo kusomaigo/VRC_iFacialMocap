@@ -63,54 +63,47 @@ namespace iFacialMocapTrackingModule
                 if (props.Length == blendData.Length)
                 {
                     int i = 0;
-                    while (i < props.Length - 3 && !blendData[i].Contains('=')) //While in the int attributes
+                    while (i < props.Length) //While in the int attributes
                     {
-                        string[] assignVal = blendData[i].Split('&');
-                        try
-                        {
+                        if(blendData[i].Contains('=')){
+                            /*string[] assignVal = blendData[i].Split('#');
+                            try
+                            {
                             if (assignVal[0] == props[i].Name)
-                            {
-                                props[i].SetValue(_trackedData, int.Parse(assignVal[1]));
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Error on setting {assignVal}.");
-                                return;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine($"Bad packet. [{e}]");
-                            return;
-                        }
-                        i++;
-                    }
-                    while (i < props.Length) // While in float[] attributes
-                    {
-                        string[] assignVal = blendData[i].Split('#');
-                        try
-                        {
-                            if (assignVal[0] == props[i].Name)
-                            {
-                                string[] unparsedValues = assignVal[1].Split(',');
-                                float[] values = new float[unparsedValues.Length];
-                                for (int j = 0; j < unparsedValues.Length; j++)
                                 {
-                                    values[j] = float.Parse(unparsedValues[j]);
+                                    check if float data
+                                    string[] unparsedValues = assignVal[1].Split(',');
+                                    float[] values = new float[unparsedValues.Length];
+                                    for (int j = 0; j < unparsedValues.Length; j++)
+                                    {
+                                        values[j] = float.Parse(unparsedValues[j]);
+                                    }
                                 }
-                                props[i].SetValue(_trackedData, values);
+                                else
+                                {
+                                    Console.WriteLine($"Error on setting {assignVal}.");
+                                    return;
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                Console.WriteLine($"Error on setting {assignVal}.");
+                                Console.WriteLine($"Bad packet. [{e}]");
+                                return;
+                            }*/
+                        }else{
+                            string[] assignVal = blendData[i].Split('&');
+                            try
+                            {
+                                //assign on dict FaceData.blends
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Bad packet. [{e}]");
                                 return;
                             }
+                            i++;
                         }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine($"Bad packet. [{e}]");
-                            return;
-                        }
+                        
                     }
                 }
                 else
