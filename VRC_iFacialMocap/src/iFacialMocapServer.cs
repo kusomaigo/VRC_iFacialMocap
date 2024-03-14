@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -54,7 +55,7 @@ namespace iFacialMocapTrackingModule
         /// Reads and parses the data recieved by the UDP Client, 
         /// storing the facial data result in the Face Data attributes.
         /// </summary>
-        void ReadData()
+        public void ReadData()
         {
             if (_udpListener != null)
             {
@@ -62,9 +63,8 @@ namespace iFacialMocapTrackingModule
                 byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
                 string returnData = Encoding.ASCII.GetString(receiveBytes);
                 string[] blendData = returnData.Split('|')[1..^1];
-                var props = typeof(FacialMocapData).GetFields();
                 int i = 0;
-                while (i < props.Length) //While in the int attributes
+                while (i < blendData.Length) //While in the int attributes
                 {
                     HandleChange(blendData[i]);
                     i++;
@@ -77,6 +77,21 @@ namespace iFacialMocapTrackingModule
             }
         }
 
+        /*public void Test(string data)
+        {
+
+            string[] blendData = data.Split('|')[1..^1];
+            int i = 0;
+            while (i < blendData.Length) //While in the int attributes
+            {
+                HandleChange(blendData[i]);
+                i++;
+            }
+        }*/
+        /// <summary>
+        /// Changes the facial data depending of the assignation recieved.
+        /// </summary>
+        /// <param name="blend"></param>
         void HandleChange(string blend)
         {
             if (blend.Contains('&'))
@@ -86,6 +101,7 @@ namespace iFacialMocapTrackingModule
                 try
                 {
                     _trackedData.blends[assignVal[0]] = int.Parse(assignVal[1]);
+                    
                 }
                 catch (Exception e)
                 {
@@ -100,9 +116,10 @@ namespace iFacialMocapTrackingModule
                 {
                     string[] unparsedValues = assignVal[1].Split(',');
                     float[] values = new float[unparsedValues.Length];
+                    
                     for (int j = 0; j < unparsedValues.Length; j++)
                     {
-                        values[j] = float.Parse(unparsedValues[j]);
+                        values[j] = float.Parse(unparsedValues[j],CultureInfo.InvariantCulture.NumberFormat);
                     }
                     if (assignVal[0] == "=head")
                     {
