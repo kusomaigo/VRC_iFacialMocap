@@ -10,6 +10,9 @@
     <Reference Include="VRCFaceTracking.Core">
         <HintPath>../VRCFaceTracking.Core.dll</HintPath>
     </Reference>
+    <Content Include="res\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+   </Content>
 </ItemGroup>
 
 </Project>

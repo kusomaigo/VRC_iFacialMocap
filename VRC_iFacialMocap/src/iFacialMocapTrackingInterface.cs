@@ -1,9 +1,11 @@
+using iFacialMocapTrackingModule;
 using VRCFaceTracking;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Params.Expressions;
 
 public class iFacialMocapTrackingInterface : ExtTrackingModule
 {
+    iFacialMocapServer server = new();
     // What your interface is able to send as tracking data.
     public override (bool SupportsEye, bool SupportsExpression) Supported => (true, true);
 
@@ -20,14 +22,14 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         var stream = 
             GetType()
             .Assembly
-            .GetManifestResourceStream("VRC_iFacialMocap.Assets.Assets.logo.png");
+            .GetManifestResourceStream("VRC_iFacialMocap.res.logo.png");
 
         // Setting the stream to be referenced by VRCFaceTracking.
         ModuleInformation.StaticImages = 
             stream != null ? new List<Stream> { stream } : ModuleInformation.StaticImages;
 
         //... Initializing module. Modify state tuple as needed (or use bool contexts to determine what should be initialized).
-
+        server.Connect();
         return state;
     }
 
@@ -36,7 +38,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     public override void Update()
     {
         // Get latest tracking data from interface and transform to VRCFaceTracking data.
-
+        server.ReadData();
         if (Status == ModuleState.Active) // Module Status validation
         {
             // ... Execute update cycle.
@@ -52,5 +54,6 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     public override void Teardown()
     {
         //... Deinitialize tracking interface; dispose any data created with the module.
+        server.Stop();
     }
 }
