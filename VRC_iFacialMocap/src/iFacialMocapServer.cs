@@ -123,14 +123,23 @@ namespace iFacialMocapTrackingModule
                     }
                     if (assignVal[0] == "=head")
                     {
-                        _trackedData.head = values;
+                        if(values.Length == 6)
+                            _trackedData.head = values;
+                        else
+                            Console.WriteLine("Insuficient data to assign head's position");
                     }else if (assignVal[0]=="rightEye")
                     {
-                        _trackedData.rightEye = values;
+                        if(values.Length == 3)
+                            _trackedData.rightEye = values;
+                        else
+                            Console.WriteLine("Insuficient data to assign right eye's position");
                     }
                     else if (assignVal[0]=="leftEye")
                     {
-                        _trackedData.leftEye = values;
+                        if(values.Length == 3)
+                            _trackedData.leftEye = values;
+                        else
+                            Console.WriteLine("Insuficient data to assign left eye's position");
                     }
                     else
                     {
