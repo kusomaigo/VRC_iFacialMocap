@@ -10,7 +10,7 @@ namespace iFacialMocapTrackingModule
         private FacialMocapData _trackedData = new();
         private UdpClient? _udpListener, _udpClient;
         public FacialMocapData FaceData { get { return _trackedData; } }
-        
+
         /// <summary>
         /// Stops and disposes the clients
         /// </summary>
@@ -61,54 +61,13 @@ namespace iFacialMocapTrackingModule
                 IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, 0);
                 byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
                 string returnData = Encoding.ASCII.GetString(receiveBytes);
-                string[] blendData = returnData.Split('|');
-                blendData = blendData[1..^1];
+                string[] blendData = returnData.Split('|')[1..^1];
                 var props = typeof(FacialMocapData).GetFields();
                 int i = 0;
                 while (i < props.Length) //While in the int attributes
                 {
-                    if (blendData[i].Contains('='))
-                    {
-                        /*string[] assignVal = blendData[i].Split('#');
-                        try
-                        {
-                        if (assignVal[0] == props[i].Name)
-                            {
-                                check if float data
-                                string[] unparsedValues = assignVal[1].Split(',');
-                                float[] values = new float[unparsedValues.Length];
-                                for (int j = 0; j < unparsedValues.Length; j++)
-                                {
-                                    values[j] = float.Parse(unparsedValues[j]);
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Error on setting {assignVal}.");
-                                return;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine($"Bad packet. [{e}]");
-                            return;
-                        }*/
-                    }
-                    else
-                    {
-                        string[] assignVal = blendData[i].Split('&');
-                        try
-                        {
-                            //assign on dict FaceData.blends
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine($"Bad packet. [{e}]");
-                            return;
-                        }
-                        i++;
-                    }
-
+                    HandleChange(blendData[i]);
+                    i++;
                 }
 
             }
@@ -116,6 +75,64 @@ namespace iFacialMocapTrackingModule
             {
                 Console.WriteLine("UDPClient wasn't initialized.");
             }
+        }
+
+        void HandleChange(string blend)
+        {
+            if (blend.Contains('&'))
+            {
+
+                string[] assignVal = blend.Split('&');
+                try
+                {
+                    _trackedData.blends[assignVal[0]] = int.Parse(assignVal[1]);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Invalid assignation. [{e};;{blend}]");
+                    return;
+                }
+            }
+            else if (blend.Contains('#'))
+            {
+                string[] assignVal = blend.Split('#');
+                try
+                {
+                    string[] unparsedValues = assignVal[1].Split(',');
+                    float[] values = new float[unparsedValues.Length];
+                    for (int j = 0; j < unparsedValues.Length; j++)
+                    {
+                        values[j] = float.Parse(unparsedValues[j]);
+                    }
+                    if (assignVal[0] == "=head")
+                    {
+                        _trackedData.head = values;
+                    }else if (assignVal[0]=="rightEye")
+                    {
+                        _trackedData.rightEye = values;
+                    }
+                    else if (assignVal[0]=="leftEye")
+                    {
+                        _trackedData.leftEye = values;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error on setting {assignVal}.");
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Invalid assignation. [{e};;{blend}]");
+                    return;
+                }
+
+            }
+            else
+            {
+                Console.WriteLine($"Data cropped.");
+            }
+
         }
     }
 }
