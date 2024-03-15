@@ -26,7 +26,7 @@ namespace iFacialMocapTrackingModule
         /// Connects to the Facial Mockup server socket.
         /// </summary>
         /// <param name="ipaddress"></param>
-        public void Connect(string ipaddress = "255.255.255.255")
+        public void Connect(string ipaddress = "127.0.0.1")
         {
             _udpListener = new(_port);
             _udpClient = new();

@@ -6,11 +6,12 @@ namespace VRCiFacialMocap
     {
         static void Main(string[] args)
         {
-            var myPropertyInfo = typeof(FacialMocapData).GetFields();
-            Console.WriteLine("Properties of System.Type are:");
-            for (int i = 0; i < myPropertyInfo.Length; i++)
-            {
-                Console.WriteLine(myPropertyInfo[i].ToString());
+            iFacialMocapTrackingInterface testInterface = new();
+            testInterface.Initialize(true,true);
+            Thread.Sleep(1000);
+            while(true){
+                testInterface.Update();
+                
             }
         }
     }
