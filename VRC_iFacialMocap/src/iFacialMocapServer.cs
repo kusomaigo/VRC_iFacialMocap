@@ -19,6 +19,7 @@ namespace iFacialMocapTrackingModule
         {
             if (_udpClient != null) { _udpClient.Close(); _udpClient.Dispose(); }
             if (_udpListener != null) { _udpListener.Close(); _udpListener.Dispose(); }
+            FaceData.blends.Clear();
         }
 
         /// <summary>
