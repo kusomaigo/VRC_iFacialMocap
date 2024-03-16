@@ -63,7 +63,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         Console.WriteLine(server.FaceData.BlendValue("jawOpen"));
         #region Eye Gaze
         UnifiedTracking.Data.Eye.Left.Gaze.x = server.FaceData.BlendValue("eyeLookOut_L") - server.FaceData.BlendValue("eyeLookIn_L");
-        UnifiedTracking.Data.Eye.Left.Gaze.y = server.FaceData.BlendValue("eyeLookUp_L") - server.FaceData.BlendValue("eyeLookUp_L");
+        UnifiedTracking.Data.Eye.Left.Gaze.y = server.FaceData.BlendValue("eyeLookUp_L") - server.FaceData.BlendValue("eyeLookDown_L");
         UnifiedTracking.Data.Eye.Right.Gaze.x = server.FaceData.BlendValue("eyeLookIn_R") - server.FaceData.BlendValue("eyeLookOut_R");
         UnifiedTracking.Data.Eye.Right.Gaze.y = server.FaceData.BlendValue("eyeLookUp_R") - server.FaceData.BlendValue("eyeLookDown_R");
         #endregion
