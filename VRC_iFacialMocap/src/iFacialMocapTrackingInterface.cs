@@ -20,10 +20,8 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         ModuleInformation.Name = "iFacialMocap";
 
         // Example of an embedded image stream being referenced as a stream
-        var stream =
-            GetType()
-            .Assembly
-            .GetManifestResourceStream("VRC_iFacialMocap.res.logo.png");
+
+        var stream = GetType().Assembly.GetManifestResourceStream("VRCFT_iFacialMocap.res.logo.png");
 
         // Setting the stream to be referenced by VRCFaceTracking.
         ModuleInformation.StaticImages =
@@ -65,9 +63,9 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         //Could make a dict<UnifiedExpressions,string> or directly assigning Data.Shapes for better performance but can do math here so whatever for now.
         Console.WriteLine(server.FaceData.BlendValue("jawOpen"));
         #region Eye Gaze
-        UnifiedTracking.Data.Eye.Left.Gaze.x = server.FaceData.BlendValue("eyeLookIn_L") - server.FaceData.BlendValue("eyeLookOut_L");
+        UnifiedTracking.Data.Eye.Left.Gaze.x = server.FaceData.BlendValue("eyeLookOut_L") - server.FaceData.BlendValue("eyeLookIn_L");
         UnifiedTracking.Data.Eye.Left.Gaze.y = server.FaceData.BlendValue("eyeLookUp_L") - server.FaceData.BlendValue("eyeLookUp_L");
-        UnifiedTracking.Data.Eye.Right.Gaze.x = server.FaceData.BlendValue("eyeLookOut_R") - server.FaceData.BlendValue("eyeLookIn_R");
+        UnifiedTracking.Data.Eye.Right.Gaze.x = server.FaceData.BlendValue("eyeLookIn_R") - server.FaceData.BlendValue("eyeLookOut_R");
         UnifiedTracking.Data.Eye.Right.Gaze.y = server.FaceData.BlendValue("eyeLookUp_R") - server.FaceData.BlendValue("eyeLookDown_R");
         #endregion
         #region Eye Openness
