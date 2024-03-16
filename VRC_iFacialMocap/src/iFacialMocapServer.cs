@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Microsoft.Extensions.Logging;
+
 
 namespace iFacialMocapTrackingModule
 {
@@ -26,7 +28,7 @@ namespace iFacialMocapTrackingModule
         /// Connects to the Facial Mockup server socket.
         /// </summary>
         /// <param name="ipaddress"></param>
-        public void Connect(string ipaddress = "127.0.0.1")
+        public void Connect(ref ILogger logger, string ipaddress = "127.0.0.1")
         {
             _udpListener = new(_port);
             _udpClient = new();
@@ -39,11 +41,11 @@ namespace iFacialMocapTrackingModule
                 _udpClient.Send(bytes, bytes.Length, dstAddr);
 
                 _udpListener.Client.ReceiveTimeout = 1000;
-
+                logger.LogInformation($"Connecting to {ipaddress}:{_port}");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"An exception has been caught while connecting to {ipaddress}:{_port} : {e}");
+                logger.LogError($"Unable to establish connection. {e}");
                 _udpListener.Close();
                 _udpClient.Close();
             }
@@ -54,25 +56,25 @@ namespace iFacialMocapTrackingModule
         /// Reads and parses the data recieved by the UDP Client, 
         /// storing the facial data result in the Face Data attributes.
         /// </summary>
-        public void ReadData()
+        public void ReadData(ref ILogger logger)
         {
             if (_udpListener != null)
             {
-                IPEndPoint RemoteIpEndPoint = null;
+                IPEndPoint? RemoteIpEndPoint = null;
                 byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
                 string returnData = Encoding.ASCII.GetString(receiveBytes);
                 string[] blendData = returnData.Split('|')[1..^1];
                 int i = 0;
                 while (i < blendData.Length) //While in the int attributes
                 {
-                    HandleChange(blendData[i]);
+                    HandleChange(blendData[i], ref logger);
                     i++;
                 }
 
             }
             else
             {
-                Console.WriteLine("UDPClient wasn't initialized.");
+                logger.LogError("UDPClient wasn't initialized.");
             }
         }
 
@@ -91,7 +93,7 @@ namespace iFacialMocapTrackingModule
         /// Changes the facial data depending of the assignation recieved.
         /// </summary>
         /// <param name="blend"></param>
-        void HandleChange(string blend)
+        void HandleChange(string blend, ref ILogger logger)
         {
             if (blend.Contains('&'))
             {
@@ -104,7 +106,7 @@ namespace iFacialMocapTrackingModule
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Invalid assignation. [{e};;{blend}]");
+                    logger.LogWarning($"Invalid assignation. [{e};;{blend}]");
                     return;
                 }
             }
@@ -125,37 +127,37 @@ namespace iFacialMocapTrackingModule
                         if(values.Length == 6)
                             _trackedData.head = values;
                         else
-                            Console.WriteLine("Insuficient data to assign head's position");
+                            logger.LogWarning("Insuficient data to assign head's position");
                     }else if (assignVal[0]=="rightEye")
                     {
                         if(values.Length == 3)
                             _trackedData.rightEye = values;
                         else
-                            Console.WriteLine("Insuficient data to assign right eye's position");
+                            logger.LogWarning("Insuficient data to assign right eye's position");
                     }
                     else if (assignVal[0]=="leftEye")
                     {
                         if(values.Length == 3)
                             _trackedData.leftEye = values;
                         else
-                            Console.WriteLine("Insuficient data to assign left eye's position");
+                            logger.LogWarning("Insuficient data to assign left eye's position");
                     }
                     else
                     {
-                        Console.WriteLine($"Error on setting {assignVal}.");
+                        logger.LogWarning($"Error on setting {assignVal}.");
                         return;
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Invalid assignation. [{e};;{blend}]");
+                    logger.LogWarning($"Invalid assignation. [{e};;{blend}]");
                     return;
                 }
 
             }
             else
             {
-                Console.WriteLine($"Data cropped.");
+                logger.LogWarning($"Data cropped.");
             }
 
         }

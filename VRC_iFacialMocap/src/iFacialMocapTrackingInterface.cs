@@ -2,7 +2,7 @@ using iFacialMocapTrackingModule;
 using VRCFaceTracking;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Params.Expressions;
-
+using Microsoft.Extensions.Logging;
 public class iFacialMocapTrackingInterface : ExtTrackingModule
 {
     iFacialMocapServer server = new();
@@ -15,7 +15,6 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
     {
         var state = (eyeAvailable, expressionAvailable);
-
         ModuleInformation.Name = "iFacialMocap";
 
         // Example of an embedded image stream being referenced as a stream
@@ -29,7 +28,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
             stream != null ? new List<Stream> { stream } : ModuleInformation.StaticImages;
 
         //... Initializing module. Modify state tuple as needed (or use bool contexts to determine what should be initialized).
-        server.Connect();
+        server.Connect(ref Logger);
         return state;
     }
 
@@ -38,7 +37,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     public override void Update()
     {
         // Get latest tracking data from interface and transform to VRCFaceTracking data.
-        server.ReadData();
+        server.ReadData(ref Logger);
         if (Status == ModuleState.Active) // Module Status validation
         {
             // ... Execute update cycle.
