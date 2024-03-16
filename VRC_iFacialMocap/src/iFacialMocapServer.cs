@@ -37,9 +37,7 @@ namespace iFacialMocapTrackingModule
                 string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
                 byte[] bytes = Encoding.UTF8.GetBytes(data);
                 _udpClient.Send(bytes, bytes.Length, dstAddr);
-                _udpClient.Close();
 
-                _udpListener.Connect("", _port);
                 _udpListener.Client.ReceiveTimeout = 1000;
 
             }
@@ -60,7 +58,7 @@ namespace iFacialMocapTrackingModule
         {
             if (_udpListener != null)
             {
-                IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, 0);
+                IPEndPoint RemoteIpEndPoint = null;
                 byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
                 string returnData = Encoding.ASCII.GetString(receiveBytes);
                 string[] blendData = returnData.Split('|')[1..^1];
