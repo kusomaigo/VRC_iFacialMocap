@@ -71,7 +71,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         UnifiedTracking.Data.Eye.Left.Openness = 1.0f - (float)Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_L") +
                 server.FaceData.BlendValue("eyeBlink_L") * server.FaceData.BlendValue("eyeSquint_L")));
     
-        UnifiedTracking.Data.Eye.Right.Openness = 1.0f - (float) Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_L") +
+        UnifiedTracking.Data.Eye.Right.Openness = 1.0f - (float) Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_R") +
                 server.FaceData.BlendValue("eyeBlink_R") * server.FaceData.BlendValue("eyeSquint_R")));
 
         #endregion
