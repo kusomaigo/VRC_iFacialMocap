@@ -1,0 +1,16 @@
+{
+    "ModuleId": "xxx",
+    "AuthorName": "Shuisho",
+    "DllFileName": "VRC_iFacialMocap.dll",
+    "Downloads": 0,
+    "DownloadUrl": "",
+    "LastUpdated": "2024-03-20T01:00:00Z",
+    "ModuleDescription": "The module provides face tracking data from iFacialMocap for use with VRCFT",
+    "ModuleName": "iFacialMocap Tracking Module",
+    "ModulePageUrl": "https://github.com/Shuisho10/VRC_iFacialMocap",
+    "Rating": 0,
+    "Ratings": 0,
+    "RatingSum": 0,
+    "UsageInstructions": "After installing the module, forward iFacialMocap data to the PC's IP Address on Port 49983.",
+    "Version": "1.0"
+  }

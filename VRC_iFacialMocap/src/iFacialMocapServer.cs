@@ -78,17 +78,6 @@ namespace iFacialMocapTrackingModule
             }
         }
 
-        /*public void Test(string data)
-        {
-
-            string[] blendData = data.Split('|')[1..^1];
-            int i = 0;
-            while (i < blendData.Length) //While in the int attributes
-            {
-                HandleChange(blendData[i]);
-                i++;
-            }
-        }*/
         /// <summary>
         /// Changes the facial data depending of the assignation recieved.
         /// </summary>
