@@ -2,9 +2,10 @@ using iFacialMocapTrackingModule;
 using VRCFaceTracking;
 using VRCFaceTracking.Core.Library;
 using VRCFaceTracking.Core.Params.Expressions;
-using Microsoft.Extensions.Logging;
+
 public class iFacialMocapTrackingInterface : ExtTrackingModule
 {
+    
     iFacialMocapServer server = new();
     // What your interface is able to send as tracking data.
     public override (bool SupportsEye, bool SupportsExpression) Supported => (true, true);
@@ -15,6 +16,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
     {
         var state = (eyeAvailable, expressionAvailable);
+
         ModuleInformation.Name = "iFacialMocap";
 
         // Example of an embedded image stream being referenced as a stream
@@ -28,7 +30,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
             stream != null ? new List<Stream> { stream } : ModuleInformation.StaticImages;
 
         //... Initializing module. Modify state tuple as needed (or use bool contexts to determine what should be initialized).
-        server.Connect(ref Logger);
+        server.Connect();
         return state;
     }
 
@@ -37,7 +39,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     public override void Update()
     {
         // Get latest tracking data from interface and transform to VRCFaceTracking data.
-        server.ReadData(ref Logger);
+        server.ReadData();
         if (Status == ModuleState.Active) // Module Status validation
         {
             // ... Execute update cycle.
@@ -47,7 +49,8 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         }
 
         // Add a delay or halt for the next update cycle for performance. eg: 
-        Thread.Sleep(10);
+        Thread.Sleep(1);
+        //Update();
     }
 
     // Called when the module is unloaded or VRCFaceTracking itself tears down.
@@ -60,25 +63,20 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     void UpdateData()
     {
         //Could make a dict<UnifiedExpressions,string> or directly assigning Data.Shapes for better performance but can do math here so whatever for now.
+        Console.WriteLine(server.FaceData.BlendValue("jawOpen"));
         #region Eye Gaze
-        UnifiedTracking.Data.Eye.Left.Gaze.x = server.FaceData.BlendValue("eyeLookOut_L")-server.FaceData.BlendValue("eyeLookIn_L");
-        UnifiedTracking.Data.Eye.Left.Gaze.y = server.FaceData.BlendValue("eyeLookUp_L")-server.FaceData.BlendValue("eyeLookUp_L");
-        UnifiedTracking.Data.Eye.Right.Gaze.x = server.FaceData.BlendValue("eyeLookOut_R")-server.FaceData.BlendValue("eyeLookIn_R");
-        UnifiedTracking.Data.Eye.Right.Gaze.y = server.FaceData.BlendValue("eyeLookUp_R")-server.FaceData.BlendValue("eyeLookDown_R");
+        UnifiedTracking.Data.Eye.Left.Gaze.x = server.FaceData.BlendValue("eyeLookIn_L") - server.FaceData.BlendValue("eyeLookOut_L");
+        UnifiedTracking.Data.Eye.Left.Gaze.y = server.FaceData.BlendValue("eyeLookUp_L") - server.FaceData.BlendValue("eyeLookUp_L");
+        UnifiedTracking.Data.Eye.Right.Gaze.x = server.FaceData.BlendValue("eyeLookOut_R") - server.FaceData.BlendValue("eyeLookIn_R");
+        UnifiedTracking.Data.Eye.Right.Gaze.y = server.FaceData.BlendValue("eyeLookUp_R") - server.FaceData.BlendValue("eyeLookDown_R");
         #endregion
         #region Eye Openness
-        UnifiedTracking.Data.Eye.Left.Openness = Math.Max(0,
-            Math.Min(
-                1f,
-                server.FaceData.BlendValue("eyeBlink_L") + server.FaceData.BlendValue("eyeBlink_L") * server.FaceData.BlendValue("eyeSquint_L")
-            )
-        );
-        UnifiedTracking.Data.Eye.Right.Openness = Math.Max(0,
-            Math.Min(
-                1f,
-                server.FaceData.BlendValue("eyeBlink_R") + server.FaceData.BlendValue("eyeBlink_R") * server.FaceData.BlendValue("eyeSquint_R")
-            )
-        );
+        UnifiedTracking.Data.Eye.Left.Openness = 1.0f - (float)Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_L") +
+                server.FaceData.BlendValue("eyeBlink_L") * server.FaceData.BlendValue("eyeSquint_L")));
+    
+        UnifiedTracking.Data.Eye.Right.Openness = 1.0f - (float) Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_L") +
+                server.FaceData.BlendValue("eyeBlink_R") * server.FaceData.BlendValue("eyeSquint_R")));
+
         #endregion
         #region Eye Blends
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.EyeSquintLeft].Weight = server.FaceData.BlendValue("eyeSquint_L");
