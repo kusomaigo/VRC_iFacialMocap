@@ -18,10 +18,8 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         ModuleInformation.Name = "iFacialMocap";
 
         // Example of an embedded image stream being referenced as a stream
-        var stream =
-            GetType()
-            .Assembly
-            .GetManifestResourceStream("VRC_iFacialMocap.res.logo.png");
+        var stream = GetType().Assembly.GetManifestResourceStream("VRCFT_iFacialMocap.res.logo.png");
+
 
         // Setting the stream to be referenced by VRCFaceTracking.
         ModuleInformation.StaticImages =
@@ -70,8 +68,8 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         #region Eye Openness
         UnifiedTracking.Data.Eye.Left.Openness = 1.0f - (float)Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_L") +
                 server.FaceData.BlendValue("eyeBlink_L") * server.FaceData.BlendValue("eyeSquint_L")));
-    
-        UnifiedTracking.Data.Eye.Right.Openness = 1.0f - (float) Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_R") +
+
+        UnifiedTracking.Data.Eye.Right.Openness = 1.0f - (float)Math.Max(0, Math.Min(1, server.FaceData.BlendValue("eyeBlink_R") +
                 server.FaceData.BlendValue("eyeBlink_R") * server.FaceData.BlendValue("eyeSquint_R")));
 
         #endregion
@@ -93,7 +91,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowLowererLeft].Weight = server.FaceData.BlendValue("browDown_L");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowOuterUpLeft].Weight = server.FaceData.BlendValue("browOuterUp_L");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowPinchLeft].Weight = server.FaceData.BlendValue("browDown_L");
-        
+
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowInnerUpRight].Weight = server.FaceData.BlendValue("browInnerUp_R");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowLowererRight].Weight = server.FaceData.BlendValue("browDown_R");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.BrowOuterUpRight].Weight = server.FaceData.BlendValue("browOuterUp_R");
@@ -132,12 +130,12 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipFunnelLowerRight].Weight = server.FaceData.BlendValue("mouthFunnel");
 
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipSuckUpperLeft].Weight = Math.Min(
-            1f - (float)Math.Pow(server.FaceData.BlendValue("mouthUpperUp_L"), 1/6f), 
+            1f - (float)Math.Pow(server.FaceData.BlendValue("mouthUpperUp_L"), 1 / 6f),
             server.FaceData.BlendValue("mouthRollUpper")
         );
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipSuckLowerLeft].Weight = server.FaceData.BlendValue("mouthRollLower");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipSuckUpperRight].Weight = Math.Min(
-            1f - (float)Math.Pow(server.FaceData.BlendValue("mouthUpperUp_L"), 1/6f), 
+            1f - (float)Math.Pow(server.FaceData.BlendValue("mouthUpperUp_L"), 1 / 6f),
             server.FaceData.BlendValue("mouthRollUpper")
         );
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.LipSuckLowerRight].Weight = server.FaceData.BlendValue("mouthRollLower");
@@ -168,7 +166,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthFrownRight].Weight = server.FaceData.BlendValue("mouthFrown_R");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthPressRight].Weight = server.FaceData.BlendValue("mouthPress_R");
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.MouthStretchRight].Weight = server.FaceData.BlendValue("mouthStretch_R");
-        
+
         //Default MouthUpperDeepenLeft, MouthCornerSlantLeft & MouthTightenerLeft
         #endregion
         #region Tongue

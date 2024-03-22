@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
+using VRCFaceTracking;
 
 
 namespace iFacialMocapTrackingModule
@@ -16,12 +18,24 @@ namespace iFacialMocapTrackingModule
 
         /// <summary>
         /// Stops and disposes the clients
-        /// </summary>
         public void Stop()
         {
             if (_udpClient != null) { _udpClient.Close(); _udpClient.Dispose(); }
             if (_udpListener != null) { _udpListener.Close(); _udpListener.Dispose(); }
             FaceData.blends.Clear();
+        }
+        /// </summary>
+        public static string GetLocalIPAddress()
+        {
+            var host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    return ip.ToString();
+                }
+            }
+            throw new Exception("No connection found!");
         }
 
         /// <summary>
@@ -32,30 +46,47 @@ namespace iFacialMocapTrackingModule
         {
             _udpListener = new(_port);
             _udpClient = new();
-            try
+
+            var timeToWait = TimeSpan.FromSeconds(120);
+
+            logger.LogInformation($"Searching iFacialMocap data for {timeToWait.TotalSeconds} seconds on {GetLocalIPAddress()}:{_port}");
+            var asyncResult = _udpListener.BeginReceive(null, null);
+            asyncResult.AsyncWaitHandle.WaitOne(timeToWait);
+            if (asyncResult.IsCompleted)
             {
+                try
+                {
 
-                IPEndPoint dstAddr = new(IPAddress.Parse(ipaddress), _port);
-                string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
-                byte[] bytes = Encoding.UTF8.GetBytes(data);
-                _udpClient.Send(bytes, bytes.Length, dstAddr);
+                    IPEndPoint dstAddr = new(IPAddress.Parse(ipaddress), _port);
+                    string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
+                    byte[] bytes = Encoding.UTF8.GetBytes(data);
+                    _udpClient.Send(bytes, bytes.Length, dstAddr);
 
-                _udpListener.Client.ReceiveTimeout = 1000;
-                logger.LogInformation($"Connecting to {ipaddress}:{_port}");
+                    _udpListener.Client.ReceiveTimeout = 1000;
+                    logger.LogInformation($"Connecting to {GetLocalIPAddress()}:{_port}");
+
+                }
+                catch (Exception e)
+                {
+                    Stop();
+                }
+
             }
-            catch (Exception e)
+
+            else
             {
-                logger.LogError($"Unable to establish connection. {e}");
-                _udpListener.Close();
-                _udpClient.Close();
+                // Could not connect in time, close module
+                logger.LogWarning("Did not receive iFacialMocap data within initialization period, re-initialize the module to try again...");
+                return;
             }
-
         }
+
 
         /// <summary>
         /// Reads and parses the data recieved by the UDP Client, 
         /// storing the facial data result in the Face Data attributes.
         /// </summary>
+
         public void ReadData(ref ILogger logger)
         {
             if (_udpListener != null)
@@ -91,7 +122,7 @@ namespace iFacialMocapTrackingModule
                 try
                 {
                     _trackedData.blends[assignVal[0]] = int.Parse(assignVal[1]);
-                    
+
                 }
                 catch (Exception e)
                 {
@@ -106,27 +137,28 @@ namespace iFacialMocapTrackingModule
                 {
                     string[] unparsedValues = assignVal[1].Split(',');
                     float[] values = new float[unparsedValues.Length];
-                    
+
                     for (int j = 0; j < unparsedValues.Length; j++)
                     {
-                        values[j] = float.Parse(unparsedValues[j],CultureInfo.InvariantCulture.NumberFormat);
+                        values[j] = float.Parse(unparsedValues[j], CultureInfo.InvariantCulture.NumberFormat);
                     }
                     if (assignVal[0] == "=head")
                     {
-                        if(values.Length == 6)
+                        if (values.Length == 6)
                             _trackedData.head = values;
                         else
                             logger.LogWarning("Insuficient data to assign head's position");
-                    }else if (assignVal[0]=="rightEye")
+                    }
+                    else if (assignVal[0] == "rightEye")
                     {
-                        if(values.Length == 3)
+                        if (values.Length == 3)
                             _trackedData.rightEye = values;
                         else
                             logger.LogWarning("Insuficient data to assign right eye's position");
                     }
-                    else if (assignVal[0]=="leftEye")
+                    else if (assignVal[0] == "leftEye")
                     {
-                        if(values.Length == 3)
+                        if (values.Length == 3)
                             _trackedData.leftEye = values;
                         else
                             logger.LogWarning("Insuficient data to assign left eye's position");
