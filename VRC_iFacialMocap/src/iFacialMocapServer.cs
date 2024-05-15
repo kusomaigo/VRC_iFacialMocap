@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
 using VRCFaceTracking;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace iFacialMocapTrackingModule
@@ -14,6 +15,7 @@ namespace iFacialMocapTrackingModule
         static private int _port = 49983; //port
         private FacialMocapData _trackedData = new();
         private UdpClient? _udpListener, _udpClient;
+        public bool isTracking;
         public FacialMocapData FaceData { get { return _trackedData; } }
 
         /// <summary>
@@ -61,9 +63,9 @@ namespace iFacialMocapTrackingModule
                     string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
                     byte[] bytes = Encoding.UTF8.GetBytes(data);
                     _udpClient.Send(bytes, bytes.Length, dstAddr);
-
                     _udpListener.Client.ReceiveTimeout = 1000;
                     logger.LogInformation($"Connecting to {GetLocalIPAddress()}:{_port}");
+                    isTracking = true;
 
                 }
                 catch (Exception e)
@@ -77,6 +79,7 @@ namespace iFacialMocapTrackingModule
             {
                 // Could not connect in time, close module
                 logger.LogWarning("Did not receive iFacialMocap data within initialization period, re-initialize the module to try again...");
+                isTracking = false;
                 return;
             }
         }
@@ -89,98 +92,113 @@ namespace iFacialMocapTrackingModule
 
         public void ReadData(ref ILogger logger)
         {
-            if (_udpListener != null)
+           if (_udpListener != null)
             {
-                IPEndPoint? RemoteIpEndPoint = null;
-                byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
-                string returnData = Encoding.ASCII.GetString(receiveBytes);
-                string[] blendData = returnData.Split('|')[1..^1];
-                int i = 0;
-                while (i < blendData.Length) //While in the int attributes
+
+                  IPEndPoint? RemoteIpEndPoint = null;
+                try {
+                  byte[] receiveBytes = _udpListener.Receive(ref RemoteIpEndPoint);
+                    string returnData = Encoding.ASCII.GetString(receiveBytes);
+                    if (isTracking==false)
+                    {
+                        isTracking = true;
+                        logger.LogInformation("Tracking restablished");
+                    }
+                    string[] blendData = returnData.Split('|')[1..^1];
+                    int i = 0;
+                    while (i < blendData.Length) //While in the int attributes
+                    {
+                        HandleChange(blendData[i], ref logger);
+                        i++;
+                    }
+                }
+                catch(Exception e)
                 {
-                    HandleChange(blendData[i], ref logger);
-                    i++;
+                    logger.LogError("Module has disconnected, waiting for reconnection...");
+                    isTracking = false;
                 }
 
-            }
-            else
-            {
-                logger.LogError("UDPClient wasn't initialized.");
-            }
-        }
-
-        /// <summary>
-        /// Changes the facial data depending of the assignation recieved.
-        /// </summary>
-        /// <param name="blend"></param>
-        void HandleChange(string blend, ref ILogger logger)
-        {
-            if (blend.Contains('&'))
-            {
-
-                string[] assignVal = blend.Split('&');
-                try
-                {
-                    _trackedData.blends[assignVal[0]] = int.Parse(assignVal[1]);
-
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.LogWarning($"Invalid assignation. [{e};;{blend}]");
-                    return;
+                    logger.LogError("UDPClient wasn't initialized.");
                 }
-            }
-            else if (blend.Contains('#'))
-            {
-                string[] assignVal = blend.Split('#');
-                try
-                {
-                    string[] unparsedValues = assignVal[1].Split(',');
-                    float[] values = new float[unparsedValues.Length];
 
-                    for (int j = 0; j < unparsedValues.Length; j++)
+                /// <summary>
+                /// Changes the facial data depending of the assignation recieved.
+                /// </summary>
+                /// <param name="blend"></param>
+                void HandleChange(string blend, ref ILogger logger)
+                {
+                if (blend.Contains('#'))
+                {
+                    string[] assignVal = blend.Split('#');
+                    try
                     {
-                        values[j] = float.Parse(unparsedValues[j], CultureInfo.InvariantCulture.NumberFormat);
-                    }
-                    if (assignVal[0] == "=head")
-                    {
-                        if (values.Length == 6)
-                            _trackedData.head = values;
+                        string[] unparsedValues = assignVal[1].Split(',');
+                        float[] values = new float[unparsedValues.Length];
+
+                        for (int j = 0; j < unparsedValues.Length; j++)
+                        {
+                            values[j] = float.Parse(unparsedValues[j], CultureInfo.InvariantCulture.NumberFormat);
+                        }
+                        if (assignVal[0] == "=head")
+                        {
+                            if (values.Length == 6)
+                                _trackedData.head = values;
+                            else
+                                logger.LogWarning("Insuficient data to assign head's position");
+                        }
+                        else if (assignVal[0] == "rightEye")
+                        {
+                            if (values.Length == 3)
+                                _trackedData.rightEye = values;
+                            else
+                                logger.LogWarning("Insuficient data to assign right eye's position");
+                        }
+                        else if (assignVal[0] == "leftEye")
+                        {
+                            if (values.Length == 3)
+                                _trackedData.leftEye = values;
+                            else
+                                logger.LogWarning("Insuficient data to assign left eye's position");
+                        }
                         else
-                            logger.LogWarning("Insuficient data to assign head's position");
+                        {
+                            logger.LogWarning($"Error on setting {assignVal}.");
+                            return;
+                        }
                     }
-                    else if (assignVal[0] == "rightEye")
+                    catch (Exception e)
                     {
-                        if (values.Length == 3)
-                            _trackedData.rightEye = values;
-                        else
-                            logger.LogWarning("Insuficient data to assign right eye's position");
-                    }
-                    else if (assignVal[0] == "leftEye")
-                    {
-                        if (values.Length == 3)
-                            _trackedData.leftEye = values;
-                        else
-                            logger.LogWarning("Insuficient data to assign left eye's position");
-                    }
-                    else
-                    {
-                        logger.LogWarning($"Error on setting {assignVal}.");
+                        logger.LogWarning($"Invalid assignation. [{e};;{blend}]");
                         return;
                     }
-                }
-                catch (Exception e)
-                {
-                    logger.LogWarning($"Invalid assignation. [{e};;{blend}]");
-                    return;
-                }
 
-            }
-            else
-            {
-                logger.LogWarning($"Data cropped.");
-            }
+                }
+                else if (blend.Contains('-') || blend.Contains('&'))
+                    {
+                    char separator = blend.Contains('&') ? '&' : '-';
+                        string[] assignVal = blend.Split(separator);
+                        try
+                        {
+                            _trackedData.blends[assignVal[0]] = int.Parse(assignVal[1]);
 
+                        }
+                        catch (Exception e)
+                        {
+                            logger.LogWarning($"Invalid assignation. [{e};;{blend}]");
+                            return;
+                        }
+                    }
+                    
+                    else
+                    {
+                        logger.LogWarning($"Data cropped.");
+                    }
+
+                }
+            
         }
     }
 }

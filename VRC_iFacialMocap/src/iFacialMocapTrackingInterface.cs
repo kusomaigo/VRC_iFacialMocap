@@ -14,7 +14,6 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     // VRCFaceTracking know what data is available to be sent from your tracking interface at initialization.
     public override (bool eyeSuccess, bool expressionSuccess) Initialize(bool eyeAvailable, bool expressionAvailable)
     {
-        var state = (eyeAvailable, expressionAvailable);
         ModuleInformation.Name = "iFacialMocap";
 
         // Example of an embedded image stream being referenced as a stream
@@ -27,6 +26,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
 
         //... Initializing module. Modify state tuple as needed (or use bool contexts to determine what should be initialized).
         server.Connect(ref Logger);
+        var state = (server.isTracking, server.isTracking);
         return state;
     }
 
@@ -36,16 +36,18 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
     {
         // Get latest tracking data from interface and transform to VRCFaceTracking data.
         server.ReadData(ref Logger);
-        if (Status == ModuleState.Active) // Module Status validation
+        if (server.isTracking)
         {
-            // ... Execute update cycle.
-            //UnifiedTracking.Data.Eye.Left.Openness = ExampleTracker.LeftEye.Openness;
-            //UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.JawOpen] = ExampleTracker.Mouth.JawOpen;
-            UpdateData();
+            if (Status == ModuleState.Active) // Module Status validation
+            {
+                // ... Execute update cycle.
+                //UnifiedTracking.Data.Eye.Left.Openness = ExampleTracker.LeftEye.Openness;
+                //UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.JawOpen] = ExampleTracker.Mouth.JawOpen;
+                UpdateData();
+            }
+            // Add a delay or halt for the next update cycle for performance. eg: 
+            Thread.Sleep(1);
         }
-
-        // Add a delay or halt for the next update cycle for performance. eg: 
-        Thread.Sleep(1);
     }
 
     // Called when the module is unloaded or VRCFaceTracking itself tears down.
