@@ -49,7 +49,7 @@ namespace iFacialMocapTrackingModule
             _udpListener = new(_port);
             _udpClient = new();
 
-            var timeToWait = TimeSpan.FromSeconds(10);
+            var timeToWait = TimeSpan.FromSeconds(120);
 
             logger.LogInformation($"Searching iFacialMocap data for {timeToWait.TotalSeconds} seconds on {GetLocalIPAddress()}:{_port}");
             var asyncResult = _udpListener.BeginReceive(null, null);
