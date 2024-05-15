@@ -60,7 +60,7 @@ namespace iFacialMocapTrackingModule
                 {
 
                     IPEndPoint dstAddr = new(IPAddress.Parse(ipaddress), _port);
-                    string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v1";
+                    string data = "iFacialMocap_sahuasouryya9218sauhuiayeta91555dy3719|sendDataVersion=v2";
                     byte[] bytes = Encoding.UTF8.GetBytes(data);
                     _udpClient.Send(bytes, bytes.Length, dstAddr);
                     _udpListener.Client.ReceiveTimeout = 1000;
