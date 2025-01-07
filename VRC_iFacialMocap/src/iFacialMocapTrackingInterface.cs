@@ -46,7 +46,7 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
                 UpdateData();
             }
             // Add a delay or halt for the next update cycle for performance. eg: 
-            Thread.Sleep(1);
+            Thread.Sleep(8);
         }
     }
 
@@ -174,6 +174,15 @@ public class iFacialMocapTrackingInterface : ExtTrackingModule
         #region Tongue
         UnifiedTracking.Data.Shapes[(int)UnifiedExpressions.TongueOut].Weight = server.FaceData.BlendValue("tongueOut");
         //Not sure if any more
+        #endregion
+        #region Head
+        // head # Euler angles X (degree), Euler angles Y, Euler angles Z, Position values X, Position values Y, Position values Z
+        UnifiedTracking.Data.Head.HeadPitch = server.FaceData.head[0];
+        UnifiedTracking.Data.Head.HeadYaw = server.FaceData.head[1];
+        UnifiedTracking.Data.Head.HeadRoll = server.FaceData.head[2];
+        UnifiedTracking.Data.Head.HeadPosX = server.FaceData.head[3];
+        UnifiedTracking.Data.Head.HeadPosY = server.FaceData.head[4];
+        UnifiedTracking.Data.Head.HeadPosZ = server.FaceData.head[5];
         #endregion
     }
 }

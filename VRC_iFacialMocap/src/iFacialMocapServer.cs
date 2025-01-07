@@ -145,7 +145,15 @@ namespace iFacialMocapTrackingModule
                         if (assignVal[0] == "=head")
                         {
                             if (values.Length == 6)
+                            {
                                 _trackedData.head = values;
+                                // normalize rotation values (Euler Angles) to [-1, 1] using 90d as normalizing factor
+                                // head # Euler angles X, Euler angles Y, Euler angles Z, moving values X, moving values Y, moving values Z 
+                                for (int k = 0; k < 3; k++)
+                                {
+                                    _trackedData.head[k] = _trackedData.head[k] / 90.0f; 
+                                }
+                            }
                             else
                                 logger.LogWarning("Insuficient data to assign head's position");
                         }
