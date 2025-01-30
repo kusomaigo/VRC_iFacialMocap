@@ -1,16 +1,16 @@
 {
     "ModuleId": "f1cc47f2-6bf2-47ef-be36-341e6efa14da",
-    "AuthorName": "Shuisho",
+    "AuthorName": "MooshPaw & Shuisho",
     "DllFileName": "VRC_iFacialMocap.dll",
     "Downloads": 0,
     "DownloadUrl": "",
     "LastUpdated": "2024-03-20T01:00:00Z",
-    "ModuleDescription": "The module provides face tracking data from iFacialMocap for use with VRCFT",
+    "ModuleDescription": "This module provides face tracking data from iFacialMocap for use with VRCFT",
     "ModuleName": "iFacialMocap Tracking Module",
     "ModulePageUrl": "https://github.com/Shuisho10/VRC_iFacialMocap",
     "Rating": 0,
     "Ratings": 0,
     "RatingSum": 0,
-    "UsageInstructions": "After installing the module, forward iFacialMocap data to the PC's IP Address on Port 49983.",
+    "UsageInstructions": "After installing the module, forward iFacialMocap data to the PC's IP Address on Port 49983. If you're using the Nvidia PC App, set the Output to iFacialMocap. For more detailed instructions, check the Github on the link above",
     "Version": "1.0"
   }
