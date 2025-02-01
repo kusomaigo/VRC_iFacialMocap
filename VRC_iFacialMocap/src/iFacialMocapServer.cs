@@ -153,6 +153,11 @@ namespace iFacialMocapTrackingModule
                                 {
                                     _trackedData.head[k] = _trackedData.head[k] / 90.0f; 
                                 }
+                                // x2 for head position data
+                                for (int k = 3; k < 6; k++)
+                                {
+                                    _trackedData.head[k] = _trackedData.head[k] * 2f;
+                                }
                             }
                             else
                                 logger.LogWarning("Insuficient data to assign head's position");
